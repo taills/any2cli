@@ -1,0 +1,131 @@
+name: Publish to npm / 发布到 npm
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Validate without publishing / 仅验证，不发布'
+        type: boolean
+        default: true
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release / 验证发布
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source / 检出源码
+        # actions/checkout v6, pinned for supply-chain safety. / 固定版本提交以降低供应链风险。
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Set up pnpm / 配置 pnpm
+        # pnpm/action-setup v6.1.0; version comes from packageManager. / 版本取自 packageManager 字段。
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - name: Set up Node.js / 配置 Node.js
+        # actions/setup-node v6; no cache in release builds. / 发布构建不使用缓存。
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Verify release ref and metadata / 验证发布引用及元数据
+        env:
+          DRY_RUN: >-
+            ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+          assert.equal(pkg.name, 'anycli');
+          assert.equal(pkg.repository.url,
+            'git+https://github.com/taills/anycli.git');
+          assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+          const expected = `refs/tags/v${pkg.version}`;
+          if (process.env.DRY_RUN !== 'true') {
+            assert.equal(process.env.GITHUB_REF, expected,
+              'Tag must match version / 标签必须匹配版本');
+          } else {
+            assert.ok([expected, 'refs/heads/main']
+              .includes(process.env.GITHUB_REF),
+              'Use main or the matching tag / 使用 main 或匹配标签');
+          }
+          NODE
+      - name: Install locked dependencies / 安装锁定依赖
+        run: pnpm install --frozen-lockfile
+      # check runs typecheck, tests with coverage thresholds and the build.
+      # check 依次执行类型检查、带覆盖率门槛的测试和构建。
+      - name: Build and validate package / 构建并验证发布包
+        run: pnpm check
+      - name: Smoke-test the built CLI / 冒烟测试构建产物
+        run: node dist/cli.js --version
+      # prepack rebuilds dist without publishing source. / 打包前重新构建 dist。
+      - name: Inspect package contents / 检查发布包内容
+        run: npm pack --dry-run
+
+  publish:
+    name: Publish with OIDC / 使用 OIDC 发布
+    needs: validate
+    if: github.event_name == 'push' || !inputs.dry_run
+    runs-on: ubuntu-latest
+    # Publishing takes a few minutes; the rest is the registry-propagation wait.
+    # 发布需数分钟，其余时间用于等待 registry 同步。
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout verified source / 检出已验证源码
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Set up pnpm / 配置 pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - name: Set up Node.js / 配置 Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install OIDC-capable npm / 安装支持 OIDC 的 npm
+        run: npm install --global npm@11.16.0
+      - name: Install locked dependencies / 安装锁定依赖
+        run: pnpm install --frozen-lockfile
+      # npm (not pnpm) publishes, for trusted publishing via OIDC.
+      # No NPM_TOKEN or NODE_AUTH_TOKEN secret is used. / 不使用长期 npm 令牌密钥。
+      - name: Publish public package with provenance / 发布公开包及来源证明
+        run: >-
+          npm publish --access public --provenance
+          --registry=https://registry.npmjs.org
+      - name: Verify registry version / 验证 registry 版本
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          # npm accepts a publish before the read path serves it; propagation
+          # has taken over three minutes, so wait six before failing.
+          # npm 接受发布早于读取端可见，实测同步超过三分钟，因此等待六分钟。
+          for attempt in $(seq 1 36); do
+            if npm view "anycli@$VERSION" \
+              version dist.integrity dist.tarball --json \
+              --prefer-online --registry=https://registry.npmjs.org; then
+              exit 0
+            fi
+            echo "Waiting for registry / 等待 registry: $attempt/36"
+            sleep 10
+          done
+          echo "Publish was accepted; only verification timed out."
+          echo "发布已被接受，仅验证超时。"
+          echo "Check the registry before acting; do not republish."
+          echo "请先查证 registry 再处理，不要重复发布。"
+          exit 1
