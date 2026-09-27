@@ -1,4 +1,5 @@
 import type { Writable } from 'node:stream';
+import pkg from '../../package.json' with { type: 'json' };
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { UnauthorizedError, type OAuthClientProvider } from '@modelcontextprotocol/sdk/client/auth.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -12,7 +13,7 @@ import { createTransport } from './transport.js';
 
 export { formatMcpResult } from './format.js';
 
-export const CLIENT_INFO = { name: 'any2cli', version: '0.1.0' };
+export const CLIENT_INFO = { name: 'any2cli', version: pkg.version };
 
 export interface McpAdapterOptions {
   name: string;

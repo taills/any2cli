@@ -1,5 +1,7 @@
 # any2cli
 
+English | [简体中文](README.zh-CN.md)
+
 **Turn any MCP server or OpenAPI spec into a CLI your agent can call.**
 
 `any2cli` wraps [Model Context Protocol](https://modelcontextprotocol.io) servers (stdio, SSE, Streamable HTTP) and REST APIs described by OpenAPI 3.x / Swagger 2.0 as ordinary shell commands, with built-in OAuth2 browser login. LLM agents that can run a shell (Claude Code, Codex, Aider, your own loop) get every tool without loading MCP schemas into their context, and without per-tool glue code.
