@@ -14,7 +14,7 @@ export interface BuildRequestInput {
   args: Record<string, unknown>;
   auth?: AuthMaterial;
   headers?: Record<string, string>;
-  /** Directories uploads must never be read from (anycli's own config and credentials). */
+  /** Directories uploads must never be read from (any2cli's own config and credentials). */
   protectedDirs?: readonly string[];
 }
 

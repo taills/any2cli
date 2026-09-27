@@ -98,7 +98,7 @@ describe('names', () => {
 
 describe('fs helpers', () => {
   it('refuses paths inside protected directories, following symlinks', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'anycli-fs-'));
+    const root = await mkdtemp(join(tmpdir(), 'any2cli-fs-'));
     const home = join(root, 'home');
     await mkdir(join(home, 'credentials'), { recursive: true });
     await writeFile(join(home, 'config.json'), '{}');
@@ -114,7 +114,7 @@ describe('fs helpers', () => {
   });
 
   it('runs critical sections one at a time', async () => {
-    const lock = join(await mkdtemp(join(tmpdir(), 'anycli-lock-')), 'x.lock');
+    const lock = join(await mkdtemp(join(tmpdir(), 'any2cli-lock-')), 'x.lock');
     let active = 0;
     let peak = 0;
     await Promise.all(
@@ -131,7 +131,7 @@ describe('fs helpers', () => {
   });
 
   it('keeps a held lock fresh so long operations are not mistaken for crashed ones', async () => {
-    const lock = join(await mkdtemp(join(tmpdir(), 'anycli-lock-')), 'slow.lock');
+    const lock = join(await mkdtemp(join(tmpdir(), 'any2cli-lock-')), 'slow.lock');
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     try {
       await withFileLock(lock, async () => {

@@ -27,8 +27,8 @@ describe('MCP authorization spec login (discovery + DCR + PKCE)', () => {
     await oauth.close();
   });
   beforeEach(async () => {
-    const home = await mkdtemp(join(tmpdir(), 'anycli-mcpauth-'));
-    paths = resolvePaths({ env: { ANYCLI_HOME: home }, cwd: home, exists: () => false });
+    const home = await mkdtemp(join(tmpdir(), 'any2cliauth-'));
+    paths = resolvePaths({ env: { ANY2CLI_HOME: home }, cwd: home, exists: () => false });
     store = new CredentialStore(paths.credentialsDir);
     target = parseTarget({ type: 'http', url: `${mcp.url}/mcp`, auth: { type: 'mcp-oauth', scopes: ['mcp'] } }) as RemoteMcpTarget;
   });
@@ -36,7 +36,7 @@ describe('MCP authorization spec login (discovery + DCR + PKCE)', () => {
   it('refuses to open a browser during normal calls', async () => {
     await expect(openTarget('remote', target, { paths })).rejects.toMatchObject({
       code: 'AUTH_REQUIRED',
-      hint: expect.stringContaining('anycli auth login remote'),
+      hint: expect.stringContaining('any2cli auth login remote'),
     });
   });
 
@@ -45,7 +45,7 @@ describe('MCP authorization spec login (discovery + DCR + PKCE)', () => {
     const result = await loginMcp({ name: 'remote', target, config: target.auth as McpOAuthConfig, store, deps: silent });
     expect(result).toEqual({ alreadyAuthorized: false, toolCount: 4 });
     expect(oauth.registeredClients.length).toBe(clientsBefore + 1);
-    expect(oauth.registeredClients.at(-1)).toMatchObject({ client_name: 'anycli', token_endpoint_auth_method: 'none' });
+    expect(oauth.registeredClients.at(-1)).toMatchObject({ client_name: 'any2cli', token_endpoint_auth_method: 'none' });
     expect(oauth.lastAuthorizeParams?.get('code_challenge_method')).toBe('S256');
 
     const record = await store.read('remote');

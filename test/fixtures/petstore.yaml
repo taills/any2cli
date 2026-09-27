@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Petstore
   version: 1.0.0
-  description: A sample pet store used by anycli tests.
+  description: A sample pet store used by any2cli tests.
 servers:
   - url: '{scheme}://petstore.example.test/{basePath}'
     variables:

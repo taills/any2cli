@@ -93,7 +93,7 @@ export async function loginMcp(input: McpLoginInput): Promise<McpLoginResult> {
       redirectUrl: server.redirectUri,
       onAuthorizationUrl: async (url) => {
         const opened = await input.deps.openUrl(url.toString()).catch(() => false);
-        input.deps.log(opened ? 'Opened your browser to authorize anycli. If nothing happened, open this URL:' : 'Open this URL in a browser to authorize anycli:');
+        input.deps.log(opened ? 'Opened your browser to authorize any2cli. If nothing happened, open this URL:' : 'Open this URL in a browser to authorize any2cli:');
         input.deps.log(`  ${url.toString()}`);
       },
     });

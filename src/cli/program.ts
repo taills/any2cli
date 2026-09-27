@@ -12,10 +12,10 @@ import { Printer } from './output.js';
 export const VERSION: string = pkg.version;
 
 export function buildProgram(runtime: Runtime): Command {
-  const program = new Command('anycli')
+  const program = new Command('any2cli')
     .description('Turn MCP servers and OpenAPI specs into CLI tools for LLM agents')
     .version(VERSION, '-V, --version')
-    .option('-c, --config <path>', 'config file (default: ./.anycli.json, else ~/.config/anycli/config.json)')
+    .option('-c, --config <path>', 'config file (default: ./.any2cli.json, else ~/.config/any2cli/config.json)')
     .option('--json', 'machine-readable JSON output (also for errors)')
     .option('--pretty', 'indent JSON output')
     .option('-v, --verbose', 'forward MCP server stderr and show stack traces')
@@ -30,12 +30,12 @@ export function buildProgram(runtime: Runtime): Command {
       'after',
       `
 Quick start:
-  anycli add mcp fs -- npx -y @modelcontextprotocol/server-filesystem ~/src
-  anycli add openapi pets https://petstore3.swagger.io/api/v3/openapi.json
-  anycli tools fs
-  anycli call fs read_file --path ~/src/README.md     (or: anycli fs read_file --path ...)
-  anycli auth login <target>                          (OAuth targets)
-  anycli gen skill -o .claude/skills                  (teach your agent)`,
+  any2cli add mcp fs -- npx -y @modelcontextprotocol/server-filesystem ~/src
+  any2cli add openapi pets https://petstore3.swagger.io/api/v3/openapi.json
+  any2cli tools fs
+  any2cli call fs read_file --path ~/src/README.md     (or: any2cli fs read_file --path ...)
+  any2cli auth login <target>                          (OAuth targets)
+  any2cli gen skill -o .claude/skills                  (teach your agent)`,
     );
 
   const ctx = () => createContext(runtime, program.opts<GlobalOptions>());
@@ -48,7 +48,7 @@ Quick start:
 
 const OPTIONS_WITH_VALUE = new Set(['-c', '--config']);
 
-/** Rewrites `anycli <target> <tool> ...` into `anycli call <target> <tool> ...`. */
+/** Rewrites `any2cli <target> <tool> ...` into `any2cli call <target> <tool> ...`. */
 async function expandShorthand(argv: string[], program: Command, runtime: Runtime): Promise<string[]> {
   let index = 0;
   let configOverride: string | undefined;
@@ -77,7 +77,7 @@ async function hintTargets(runtime: Runtime): Promise<void> {
     const { paths } = createContext(runtime, {});
     const names = Object.keys((await loadConfig(paths.configFile)).targets);
     runtime.io.stderr.write(
-      names.length > 0 ? `hint: configured targets: ${names.join(', ')} (run \`anycli <target> <tool> ...\`)\n` : 'hint: no targets configured yet; see `anycli add --help`\n',
+      names.length > 0 ? `hint: configured targets: ${names.join(', ')} (run \`any2cli <target> <tool> ...\`)\n` : 'hint: no targets configured yet; see `any2cli add --help`\n',
     );
   } catch {
     // The config itself is broken; commander's message is enough.

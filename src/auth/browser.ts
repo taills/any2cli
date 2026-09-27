@@ -7,12 +7,12 @@ function isHeadless(env: NodeJS.ProcessEnv): boolean {
 }
 
 /**
- * Opens a URL in the user's browser. Honours `ANYCLI_NO_BROWSER=1` and the conventional
+ * Opens a URL in the user's browser. Honours `ANY2CLI_NO_BROWSER=1` and the conventional
  * `BROWSER` variable. Returns false when no browser could be launched so callers can fall back
  * to printing the URL.
  */
 export async function openBrowser(url: string, env: NodeJS.ProcessEnv = process.env): Promise<boolean> {
-  if (env.ANYCLI_NO_BROWSER === '1' || env.ANYCLI_NO_BROWSER === 'true') return false;
+  if (env.ANY2CLI_NO_BROWSER === '1' || env.ANY2CLI_NO_BROWSER === 'true') return false;
   if (env.BROWSER) {
     return new Promise((resolve) => {
       const child = spawn(env.BROWSER as string, [url], { stdio: 'ignore', detached: true });

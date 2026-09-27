@@ -74,7 +74,7 @@ function registerGen(program: Command, ctx: () => Context): void {
 
   gen
     .command('skill')
-    .description('Generate SKILL.md files so agents know how to use targets (no names: an index skill for anycli)')
+    .description('Generate SKILL.md files so agents know how to use targets (no names: an index skill for any2cli)')
     .argument('[targets...]')
     .option('-o, --out <dir>', 'write <dir>/<skill-name>/SKILL.md instead of printing (e.g. .claude/skills)')
     .action(async (names: string[], flags: { out?: string }) => {
@@ -87,7 +87,7 @@ function registerGen(program: Command, ctx: () => Context): void {
           type: target.type,
           description: target.description ?? (target.type === 'stdio' ? `MCP server (${target.command})` : target.type === 'openapi' ? 'REST API' : 'remote MCP server'),
         }));
-        documents.push({ skill: 'anycli', content: renderIndexSkill(entries) });
+        documents.push({ skill: 'any2cli', content: renderIndexSkill(entries) });
       }
       for (const name of names) {
         const target = getTarget(config, name);

@@ -20,7 +20,7 @@ export interface ParsedTokens {
   reserved: ReservedOptions;
 }
 
-/** Options consumed by anycli itself; every other `--flag` is forwarded to the tool. */
+/** Options consumed by any2cli itself; every other `--flag` is forwarded to the tool. */
 export const RESERVED_FLAGS = ['--args', '--args-file', '--raw', '--dry-run', '--call-timeout', '--save', '--help', '-h'];
 
 const VALUE_FLAGS = new Set(['args', 'args-file', 'call-timeout', 'save']);
@@ -55,7 +55,7 @@ function applyReserved(reserved: ReservedOptions, key: string, value: string | t
 
 const RESERVED_KEYS = new Set(['raw', 'dry-run', 'help', 'args', 'args-file', 'save', 'call-timeout']);
 
-/** Splits raw argv tokens after `<target> <tool>` into tool arguments and anycli's own options. */
+/** Splits raw argv tokens after `<target> <tool>` into tool arguments and any2cli's own options. */
 export function parseToolTokens(tokens: readonly string[]): ParsedTokens {
   let reserved: ReservedOptions = { raw: false, dryRun: false, help: false };
   const pairs: ArgPair[] = [];
@@ -103,13 +103,13 @@ export function parseToolTokens(tokens: readonly string[]): ParsedTokens {
   return { pairs, reserved };
 }
 
-/** anycli's global flags that users (and agents) often append after the tool arguments. */
+/** any2cli's global flags that users (and agents) often append after the tool arguments. */
 export const TRAILING_GLOBAL_KEYS = ['json', 'pretty', 'verbose'] as const;
 export type TrailingGlobal = (typeof TRAILING_GLOBAL_KEYS)[number];
 
 /**
  * Separates a bare `--json` / `--pretty` / `--verbose` from the tool arguments. They belong to
- * anycli unless the tool itself declares a parameter with that name.
+ * any2cli unless the tool itself declares a parameter with that name.
  */
 export function splitGlobalFlags(pairs: readonly ArgPair[], schema?: JsonSchema): { pairs: ArgPair[]; globals: TrailingGlobal[] } {
   const properties = schema?.properties ?? {};

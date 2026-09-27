@@ -16,7 +16,7 @@ export interface OpenApiAdapterOptions {
   resolveAuth: (forceRefresh: boolean) => Promise<AuthMaterial>;
   canRefresh?: boolean;
   fetchImpl?: typeof fetch;
-  /** Paths uploads and --save must never touch (anycli's own config and credentials). */
+  /** Paths uploads and --save must never touch (any2cli's own config and credentials). */
   protectedDirs?: readonly string[];
 }
 
@@ -108,7 +108,7 @@ class OpenApiAdapter implements TargetAdapter {
     if (tool) return tool;
     const similar = suggestNames(this.tools, name);
     throw new CliError('NOT_FOUND', `Operation "${name}" not found on target "${this.options.name}"`, {
-      hint: similar.length > 0 ? `Did you mean: ${similar.join(', ')}?` : `Run \`anycli tools ${this.options.name}\` to list operations`,
+      hint: similar.length > 0 ? `Did you mean: ${similar.join(', ')}?` : `Run \`any2cli tools ${this.options.name}\` to list operations`,
     });
   }
 
@@ -117,7 +117,7 @@ class OpenApiAdapter implements TargetAdapter {
     const baseUrl = configured ? interpolate(configured) : this.options.manifest.baseUrl;
     if (!baseUrl) {
       throw new CliError('CONFIG', `Target "${this.options.name}" has no base URL`, {
-        hint: 'The spec declares no absolute server URL; set one with `anycli add openapi <name> <spec> --base-url <url>`',
+        hint: 'The spec declares no absolute server URL; set one with `any2cli add openapi <name> <spec> --base-url <url>`',
       });
     }
     return baseUrl;
@@ -168,7 +168,7 @@ class OpenApiAdapter implements TargetAdapter {
     if (response.ok) return { ok: true, output };
     const hint =
       response.status === 401 || response.status === 403
-        ? `Check credentials; for OAuth2 targets run \`anycli auth login ${this.options.name}\``
+        ? `Check credentials; for OAuth2 targets run \`any2cli auth login ${this.options.name}\``
         : undefined;
     return { ok: false, output, details: { status: response.status, ...(hint ? { hint } : {}) } };
   }

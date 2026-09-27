@@ -31,13 +31,13 @@ function sink(chunks: string[]): Writable {
 }
 
 async function makeCli(): Promise<{ home: string; cli: (...argv: string[]) => Promise<Result> }> {
-  const home = await mkdtemp(join(tmpdir(), 'anycli-e2e-'));
+  const home = await mkdtemp(join(tmpdir(), 'any2cli-e2e-'));
   const cli = async (...argv: string[]): Promise<Result> => {
     const out: string[] = [];
     const err: string[] = [];
     const runtime: Runtime = {
       io: { stdout: sink(out), stderr: sink(err), stdoutIsTTY: false },
-      env: { ...process.env, ANYCLI_HOME: home, ANYCLI_CONFIG: undefined },
+      env: { ...process.env, ANY2CLI_HOME: home, ANY2CLI_CONFIG: undefined },
       cwd: home,
       openUrl: fakeBrowser,
       readStdin: async () => '{"text":"from stdin"}',
@@ -48,7 +48,7 @@ async function makeCli(): Promise<{ home: string; cli: (...argv: string[]) => Pr
   return { home, cli };
 }
 
-describe('anycli CLI with a stdio MCP server', () => {
+describe('any2cli CLI with a stdio MCP server', () => {
   let cli: (...argv: string[]) => Promise<Result>;
   let home: string;
   beforeAll(async () => {
@@ -108,16 +108,16 @@ describe('anycli CLI with a stdio MCP server', () => {
 
   it('generates skills and shims', async () => {
     const index = await cli('gen', 'skill');
-    expect(index.stdout).toContain('name: anycli\n');
+    expect(index.stdout).toContain('name: any2cli\n');
     expect(index.stdout).toContain('**fx** (stdio): Fixture tools');
     const out = await cli('gen', 'skill', 'fx', '--out', 'skills');
     expect(out.code).toBe(0);
-    const skill = await readFile(join(home, 'skills', 'anycli-fx', 'SKILL.md'), 'utf8');
-    expect(skill).toContain('`anycli call fx add_numbers --a <number> --b <number>`');
+    const skill = await readFile(join(home, 'skills', 'any2cli-fx', 'SKILL.md'), 'utf8');
+    expect(skill).toContain('`any2cli call fx add_numbers --a <number> --b <number>`');
     const shim = await cli('gen', 'shim', 'fx', '--dir', 'bin');
     expect(shim.code).toBe(0);
     const shimPath = join(home, 'bin', 'fx');
-    expect(await readFile(shimPath, 'utf8')).toContain(`exec "\${ANYCLI_BIN:-anycli}" call 'fx' "$@"`);
+    expect(await readFile(shimPath, 'utf8')).toContain(`exec "\${ANY2CLI_BIN:-any2cli}" call 'fx' "$@"`);
     expect((await stat(shimPath)).mode & 0o111).not.toBe(0);
     expect((await cli('gen', 'shim', 'fx', '--dir', 'bin')).code).toBe(2);
   });
@@ -129,7 +129,7 @@ describe('anycli CLI with a stdio MCP server', () => {
   });
 });
 
-describe('anycli CLI with an OpenAPI target', () => {
+describe('any2cli CLI with an OpenAPI target', () => {
   let api: MockApi;
   let oauth: MockOAuthServer;
   beforeAll(async () => {
@@ -139,17 +139,17 @@ describe('anycli CLI with an OpenAPI target', () => {
       if (req.path.startsWith('/oauth') && !oauth.validTokens.has(token)) return { status: 401, body: '{"error":"login"}' };
       return undefined;
     });
-    process.env.ANYCLI_TEST_TOKEN = 'tok-123';
+    process.env.ANY2CLI_TEST_TOKEN = 'tok-123';
   });
   afterAll(async () => {
     await api.close();
     await oauth.close();
-    delete process.env.ANYCLI_TEST_TOKEN;
+    delete process.env.ANY2CLI_TEST_TOKEN;
   });
 
   it('adds a spec with a static token from the environment and calls operations', async () => {
     const { cli, home } = await makeCli();
-    const added = await cli('add', 'openapi', 'pets', PETSTORE, '--base-url', api.url, '--bearer', '${ANYCLI_TEST_TOKEN}');
+    const added = await cli('add', 'openapi', 'pets', PETSTORE, '--base-url', api.url, '--bearer', '${ANY2CLI_TEST_TOKEN}');
     expect(added.code).toBe(0);
     expect(added.stdout).toContain('9 operations');
     expect(await readFile(join(home, 'config.json'), 'utf8')).not.toContain('tok-123');
@@ -162,14 +162,14 @@ describe('anycli CLI with an OpenAPI target', () => {
     const dry = JSON.parse((await cli('pets', 'create-pet', '--name', 'Rex', '--dry-run')).stdout);
     expect(dry.headers.Authorization).toBe('Bearer ***');
     const shown = (await cli('show', 'pets')).stdout;
-    expect(shown).toContain('${ANYCLI_TEST_TOKEN}');
+    expect(shown).toContain('${ANY2CLI_TEST_TOKEN}');
     expect(JSON.parse(shown).spec).toMatchObject({ title: 'Petstore', operations: 9 });
     expect((await cli('refresh', 'pets')).stdout).toContain('9 operations');
   });
 
   it('logs in with OAuth2 in the browser, calls the API, and logs out', async () => {
     const { cli } = await makeCli();
-    const spec = join(await mkdtemp(join(tmpdir(), 'anycli-spec-')), 'oauth.yaml');
+    const spec = join(await mkdtemp(join(tmpdir(), 'any2cli-spec-')), 'oauth.yaml');
     await writeFile(
       spec,
       (await readFile(PETSTORE, 'utf8'))
@@ -178,7 +178,7 @@ describe('anycli CLI with an OpenAPI target', () => {
     );
     const added = await cli('add', 'openapi', 'secure', spec, '--base-url', `${api.url}/oauth`, '--oauth', '--client-id', 'cli', '--client-secret', 'shh');
     expect(added.code).toBe(0);
-    expect(added.stdout).toContain('Next: anycli auth login secure');
+    expect(added.stdout).toContain('Next: any2cli auth login secure');
     expect(added.stderr).toContain(`authorization: ${oauth.url}/authorize`);
 
     expect((await cli('secure', 'list-pets')).code).toBe(3);
@@ -199,12 +199,12 @@ describe('anycli CLI with an OpenAPI target', () => {
     expect((await cli('auth', 'logout', 'secure')).code).toBe(0);
     const after = await cli('secure', 'list-pets');
     expect(after.code).toBe(3);
-    expect(after.stderr).toContain('anycli auth login secure');
+    expect(after.stderr).toContain('any2cli auth login secure');
   });
 
   it('pins the base URL from the spec and warns when a refreshed spec points elsewhere', async () => {
     const { cli, home } = await makeCli();
-    const spec = join(await mkdtemp(join(tmpdir(), 'anycli-spec-')), 'pets.yaml');
+    const spec = join(await mkdtemp(join(tmpdir(), 'any2cli-spec-')), 'pets.yaml');
     const original = await readFile(PETSTORE, 'utf8');
     await writeFile(spec, original);
     expect((await cli('add', 'openapi', 'pinned', spec)).code).toBe(0);
@@ -221,7 +221,7 @@ describe('anycli CLI with an OpenAPI target', () => {
     expect(dry.url.startsWith(pinned)).toBe(true);
   });
 
-  it('recompiles a manifest cached by an older anycli version', async () => {
+  it('recompiles a manifest cached by an older any2cli version', async () => {
     const { cli, home } = await makeCli();
     expect((await cli('add', 'openapi', 'old', PETSTORE, '--base-url', api.url)).code).toBe(0);
     const cache = join(home, 'cache', 'old.openapi.json');
@@ -238,7 +238,7 @@ describe('anycli CLI with an OpenAPI target', () => {
   });
 });
 
-describe('anycli CLI with a remote MCP server using MCP OAuth', () => {
+describe('any2cli CLI with a remote MCP server using MCP OAuth', () => {
   let oauth: MockOAuthServer;
   let mcp: RunningHttpServer;
   beforeAll(async () => {
@@ -252,10 +252,10 @@ describe('anycli CLI with a remote MCP server using MCP OAuth', () => {
 
   it('asks for login, logs in via the browser, then calls tools', async () => {
     const { cli } = await makeCli();
-    expect((await cli('add', 'mcp', 'remote', `${mcp.url}/mcp`, '--oauth')).stdout).toContain('Next: anycli auth login remote');
+    expect((await cli('add', 'mcp', 'remote', `${mcp.url}/mcp`, '--oauth')).stdout).toContain('Next: any2cli auth login remote');
     const before = await cli('remote', 'echo', '--text', 'x');
     expect(before.code).toBe(3);
-    expect(before.stderr).toContain('anycli auth login remote');
+    expect(before.stderr).toContain('any2cli auth login remote');
     const login = await cli('auth', 'login', 'remote');
     expect(login).toMatchObject({ code: 0, stdout: 'Logged in to "remote" (4 tools available)\n' });
     expect(await cli('remote', 'echo', '--text', 'secured')).toMatchObject({ code: 0, stdout: 'secured\n' });
@@ -307,9 +307,9 @@ describe('import, remove and failures', () => {
 
 describe('the real executable', () => {
   it('runs as a process and exits promptly', async () => {
-    const home = await mkdtemp(join(tmpdir(), 'anycli-proc-'));
+    const home = await mkdtemp(join(tmpdir(), 'any2cli-proc-'));
     const exec = promisify(execFile);
-    const env = { ...process.env, ANYCLI_HOME: home };
+    const env = { ...process.env, ANY2CLI_HOME: home };
     const bin = [process.execPath, '--import', 'tsx', join(ROOT, 'src/cli.ts')];
     const call = (...args: string[]) => exec(bin[0] as string, [...bin.slice(1), ...args], { env, cwd: ROOT, timeout: 30_000 });
     await call('add', 'mcp', 'fx', ...STDIO);

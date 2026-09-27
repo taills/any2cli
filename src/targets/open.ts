@@ -25,7 +25,7 @@ export async function compileOpenApiTarget(name: string, target: OpenApiTarget, 
   return manifest;
 }
 
-/** anycli's own files: tool uploads and --save must never read or overwrite them. */
+/** any2cli's own files: tool uploads and --save must never read or overwrite them. */
 export function protectedPaths(paths: Paths): string[] {
   return [paths.home, paths.configFile, paths.credentialsDir, paths.cacheDir];
 }

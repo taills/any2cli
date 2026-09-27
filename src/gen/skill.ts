@@ -15,7 +15,7 @@ function yamlString(text: string): string {
 }
 
 export function skillName(target: string): string {
-  return `anycli-${target.toLowerCase().replace(/[^a-z0-9-]+/g, '-')}`;
+  return `any2cli-${target.toLowerCase().replace(/[^a-z0-9-]+/g, '-')}`;
 }
 
 export interface TargetSkillInput {
@@ -25,22 +25,22 @@ export interface TargetSkillInput {
   title?: string;
 }
 
-/** Renders an Agent Skill (SKILL.md) teaching an agent to use one target through anycli. */
+/** Renders an Agent Skill (SKILL.md) teaching an agent to use one target through any2cli. */
 export function renderTargetSkill({ name, target, tools, title }: TargetSkillInput): string {
   const kind = target.type === 'openapi' ? 'REST API' : 'MCP server';
   const about = target.description ?? title ?? `the "${name}" ${kind}`;
   const examples = tools.slice(0, 6).map((tool) => tool.name).join(', ');
   const description = oneLine(
-    `${about}. Use it through the anycli CLI: \`anycli call ${name} <tool> --param value\` (${tools.length} tools, e.g. ${examples}).`,
+    `${about}. Use it through the any2cli CLI: \`any2cli call ${name} <tool> --param value\` (${tools.length} tools, e.g. ${examples}).`,
   );
   const listed = tools.slice(0, MAX_LISTED_TOOLS);
   const sections = listed.map((tool) => {
     const summary = firstLine(tool.description, 200);
-    return [`### ${tool.name}`, ...(summary ? [summary] : []), `\`anycli call ${name} ${renderSignature(tool)}\``].join('\n');
+    return [`### ${tool.name}`, ...(summary ? [summary] : []), `\`any2cli call ${name} ${renderSignature(tool)}\``].join('\n');
   });
   const more =
     tools.length > listed.length
-      ? [`…and ${tools.length - listed.length} more. Search with \`anycli tools ${name} --filter <text>\`.`]
+      ? [`…and ${tools.length - listed.length} more. Search with \`any2cli tools ${name} --filter <text>\`.`]
       : [];
   return [
     '---',
@@ -48,17 +48,17 @@ export function renderTargetSkill({ name, target, tools, title }: TargetSkillInp
     `description: ${yamlString(description)}`,
     '---',
     '',
-    `# ${name} (${kind} via anycli)`,
+    `# ${name} (${kind} via any2cli)`,
     '',
     about.endsWith('.') ? about : `${about}.`,
     '',
     '## How to call',
     '',
-    `- List tools: \`anycli tools ${name}\` (add \`--filter <text>\` to search)`,
-    `- Full parameter docs: \`anycli describe ${name} <tool>\``,
-    `- Call: \`anycli call ${name} <tool> --param value\`; repeat a flag for arrays, pass objects as JSON, or pass everything with \`--args '{...}'\``,
+    `- List tools: \`any2cli tools ${name}\` (add \`--filter <text>\` to search)`,
+    `- Full parameter docs: \`any2cli describe ${name} <tool>\``,
+    `- Call: \`any2cli call ${name} <tool> --param value\`; repeat a flag for arrays, pass objects as JSON, or pass everything with \`--args '{...}'\``,
     '- Add `--dry-run` to preview a call without executing it.',
-    `- Exit codes: 0 ok · 2 bad arguments · 3 login required (\`anycli auth login ${name}\`) · 4 the tool/API returned an error (output is still printed) · 5 connection problem`,
+    `- Exit codes: 0 ok · 2 bad arguments · 3 login required (\`any2cli auth login ${name}\`) · 4 the tool/API returned an error (output is still printed) · 5 connection problem`,
     '',
     '## Tools',
     '',
@@ -76,26 +76,26 @@ export interface IndexEntry {
   description: string;
 }
 
-/** Renders a general SKILL.md describing anycli itself and the configured targets. */
+/** Renders a general SKILL.md describing any2cli itself and the configured targets. */
 export function renderIndexSkill(targets: IndexEntry[]): string {
   const names = targets.map((target) => target.name).join(', ') || 'none yet';
   return [
     '---',
-    'name: anycli',
-    `description: ${yamlString(oneLine(`Call external tools and APIs (MCP servers and OpenAPI services) from the shell with the anycli CLI. Configured targets: ${names}.`))}`,
+    'name: any2cli',
+    `description: ${yamlString(oneLine(`Call external tools and APIs (MCP servers and OpenAPI services) from the shell with the any2cli CLI. Configured targets: ${names}.`))}`,
     '---',
     '',
-    '# anycli',
+    '# any2cli',
     '',
-    'anycli exposes MCP servers and OpenAPI REST APIs as shell commands. Discover before calling:',
+    'any2cli exposes MCP servers and OpenAPI REST APIs as shell commands. Discover before calling:',
     '',
-    '1. `anycli list` — configured targets',
-    '2. `anycli tools <target>` — tools of a target with their parameters (`--filter <text>` to search)',
-    '3. `anycli describe <target> <tool>` — full documentation of one tool',
-    '4. `anycli call <target> <tool> --param value` — run it (`--args \'{...}\'` for a JSON object, `--dry-run` to preview)',
+    '1. `any2cli list` — configured targets',
+    '2. `any2cli tools <target>` — tools of a target with their parameters (`--filter <text>` to search)',
+    '3. `any2cli describe <target> <tool>` — full documentation of one tool',
+    '4. `any2cli call <target> <tool> --param value` — run it (`--args \'{...}\'` for a JSON object, `--dry-run` to preview)',
     '',
     'Results are printed to stdout (JSON for structured data). Errors go to stderr with a hint.',
-    'Exit codes: 0 ok · 2 bad arguments · 3 login required (run `anycli auth login <target>` and ask the user to finish in the browser) · 4 tool/API error · 5 connection problem · 6 config problem.',
+    'Exit codes: 0 ok · 2 bad arguments · 3 login required (run `any2cli auth login <target>` and ask the user to finish in the browser) · 4 tool/API error · 5 connection problem · 6 config problem.',
     '',
     '## Targets',
     '',
@@ -105,5 +105,5 @@ export function renderIndexSkill(targets: IndexEntry[]): string {
 }
 
 export function renderShim(target: string): string {
-  return ['#!/bin/sh', `# Generated by anycli: runs tools of target "${target}"`, `exec "\${ANYCLI_BIN:-anycli}" call '${target}' "$@"`, ''].join('\n');
+  return ['#!/bin/sh', `# Generated by any2cli: runs tools of target "${target}"`, `exec "\${ANY2CLI_BIN:-any2cli}" call '${target}' "$@"`, ''].join('\n');
 }

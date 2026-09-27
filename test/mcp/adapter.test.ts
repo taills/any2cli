@@ -63,7 +63,7 @@ describe('MCP adapter over stdio', () => {
   });
 
   it('reports a CONNECTION error when the command does not exist', async () => {
-    const target = parseTarget({ type: 'stdio', command: 'anycli-definitely-missing-binary' });
+    const target = parseTarget({ type: 'stdio', command: 'any2cli-definitely-missing-binary' });
     await expect(openMcpAdapter({ name: 'missing', target: target as McpTarget, timeoutMs: 5000 })).rejects.toMatchObject({
       code: 'CONNECTION',
     });
@@ -127,7 +127,7 @@ describe('formatMcpResult', () => {
   });
 
   it('saves binary content with --save', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-save-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-save-'));
     const file = join(dir, 'out.png');
     const result = await formatMcpResult(
       { content: [{ type: 'image', data: Buffer.from('png').toString('base64'), mimeType: 'image/png' }] },
@@ -138,7 +138,7 @@ describe('formatMcpResult', () => {
   });
 
   it('refuses to --save into protected directories', async () => {
-    const home = await mkdtemp(join(tmpdir(), 'anycli-home-'));
+    const home = await mkdtemp(join(tmpdir(), 'any2cli-home-'));
     await expect(
       formatMcpResult(
         { content: [{ type: 'image', data: Buffer.from('png').toString('base64'), mimeType: 'image/png' }] },

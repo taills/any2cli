@@ -30,7 +30,7 @@ function matchesFilter(tool: ToolDescriptor, filter: string | undefined): boolea
 function renderToolList(name: string, type: string, tools: ToolDescriptor[], total: number): string {
   const header = [
     `${name} (${type}) — ${tools.length === total ? total : `${tools.length} of ${total}`} tools`,
-    `Call: anycli call ${name} <tool> --param value   Details: anycli describe ${name} <tool>`,
+    `Call: any2cli call ${name} <tool> --param value   Details: any2cli describe ${name} <tool>`,
     '',
   ];
   const body = tools.flatMap((tool) => {
@@ -75,13 +75,13 @@ export function registerToolCommands(program: Command, ctx: () => Context): void
       const context = ctx();
       await withAdapter(context, name, async (adapter) => {
         const tool = await adapter.getTool(toolName);
-        context.printer.result(tool, renderToolHelp(tool, `anycli call ${name}`));
+        context.printer.result(tool, renderToolHelp(tool, `any2cli call ${name}`));
       });
     });
 
   program
     .command('call')
-    .description('Call a tool: anycli call <target> <tool> --param value ... (shorthand: anycli <target> <tool> ...)')
+    .description('Call a tool: any2cli call <target> <tool> --param value ... (shorthand: any2cli <target> <tool> ...)')
     .argument('<target>')
     .argument('<tool>')
     .argument('[params...]', "tool parameters as --name value, or --args '<json>'")
@@ -105,7 +105,7 @@ Exit codes: 0 ok, 2 usage, 3 login required, 4 tool/API error, 5 connection, 6 c
     .action(async (name: string, toolName: string, params: string[]) => {
       const parsed = parseToolTokens(params);
       const before = program.opts<GlobalOptions>();
-      // Until the tool schema is known, treat trailing --json etc. as anycli's (so early errors honor them).
+      // Until the tool schema is known, treat trailing --json etc. as any2cli's (so early errors honor them).
       const tentative = splitGlobalFlags(parsed.pairs).globals;
       setGlobals(program, tentative, () => true);
       await withAdapter(ctx(), name, async (adapter) => {
@@ -114,7 +114,7 @@ Exit codes: 0 ok, 2 usage, 3 login required, 4 tool/API error, 5 connection, 6 c
         setGlobals(program, tentative.filter((key) => !globals.includes(key)), (key) => before[key]);
         const context = ctx();
         if (parsed.reserved.help) {
-          context.printer.data(renderToolHelp(tool, `anycli call ${name}`));
+          context.printer.data(renderToolHelp(tool, `any2cli call ${name}`));
           return;
         }
         const readStdin = context.runtime.readStdin ?? readAllStdin;

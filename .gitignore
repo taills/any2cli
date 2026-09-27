@@ -3,4 +3,4 @@ dist/
 coverage/
 *.log
 .DS_Store
-.anycli.json
+.any2cli.json

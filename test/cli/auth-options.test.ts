@@ -5,12 +5,12 @@ import { CliError } from '../../src/core/errors.js';
 
 describe('openBrowser', () => {
   it('does nothing when disabled', async () => {
-    expect(await openBrowser('http://x', { ANYCLI_NO_BROWSER: '1' })).toBe(false);
+    expect(await openBrowser('http://x', { ANY2CLI_NO_BROWSER: '1' })).toBe(false);
   });
 
   it('uses $BROWSER when set', async () => {
     expect(await openBrowser('http://x', { BROWSER: 'true' })).toBe(true);
-    expect(await openBrowser('http://x', { BROWSER: 'anycli-no-such-browser' })).toBe(false);
+    expect(await openBrowser('http://x', { BROWSER: 'any2cli-no-such-browser' })).toBe(false);
   });
 });
 

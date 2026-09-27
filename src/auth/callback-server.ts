@@ -30,7 +30,7 @@ function escapeHtml(text: string): string {
 }
 
 function page(title: string, message: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><title>anycli</title></head><body style="font-family:system-ui;max-width:32rem;margin:4rem auto"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>any2cli</title></head><body style="font-family:system-ui;max-width:32rem;margin:4rem auto"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p></body></html>`;
 }
 
 function listen(server: Server, port: number, address: string): Promise<void> {

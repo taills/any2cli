@@ -59,7 +59,7 @@ export class FileMcpOAuthProvider implements OAuthClientProvider {
 
   get clientMetadata(): OAuthClientMetadata {
     return {
-      client_name: 'anycli',
+      client_name: 'any2cli',
       redirect_uris: [this.redirectUrl],
       grant_types: ['authorization_code', 'refresh_token'],
       response_types: ['code'],
@@ -96,7 +96,7 @@ export class FileMcpOAuthProvider implements OAuthClientProvider {
   async redirectToAuthorization(url: URL): Promise<void> {
     if (!this.options.interactive || !this.options.onAuthorizationUrl) {
       throw new CliError('AUTH_REQUIRED', `Target "${this.options.name}" requires a browser login`, {
-        hint: `Run \`anycli auth login ${this.options.name}\``,
+        hint: `Run \`any2cli auth login ${this.options.name}\``,
       });
     }
     await this.options.onAuthorizationUrl(url);

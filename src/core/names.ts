@@ -2,7 +2,7 @@ import { CliError } from './errors.js';
 
 const TARGET_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 
-/** Names that would be shadowed by built-in subcommands when used as `anycli <target> <tool>`. */
+/** Names that would be shadowed by built-in subcommands when used as `any2cli <target> <tool>`. */
 export const RESERVED_NAMES = new Set([
   'add',
   'auth',
@@ -29,7 +29,7 @@ export function assertTargetName(name: string): void {
   }
   if (RESERVED_NAMES.has(name.toLowerCase())) {
     throw new CliError('USAGE', `Target name "${name}" is reserved`, {
-      hint: 'It collides with an anycli subcommand; pick another name',
+      hint: 'It collides with an any2cli subcommand; pick another name',
     });
   }
 }

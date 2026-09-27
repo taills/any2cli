@@ -117,7 +117,7 @@ describe('buildToolArgs', () => {
   });
 
   it('reads --args-file', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-args-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-args-'));
     const file = join(dir, 'args.json');
     await writeFile(file, JSON.stringify({ petId: 9 }));
     const args = await buildToolArgs({ ...parseToolTokens(['--args-file', file]), schema });
@@ -168,7 +168,7 @@ describe('buildToolArgs', () => {
 });
 
 describe('splitGlobalFlags', () => {
-  it('takes trailing --json/--pretty/--verbose/-v for anycli unless the tool declares them', () => {
+  it('takes trailing --json/--pretty/--verbose/-v for any2cli unless the tool declares them', () => {
     const { pairs } = parseToolTokens(['--q', 'x', '--json', '-v', '--pretty', '--json']);
     expect(splitGlobalFlags(pairs)).toEqual({ pairs: [['q', 'x']], globals: ['json', 'verbose', 'pretty'] });
     expect(splitGlobalFlags(pairs, schema)).toEqual({
@@ -205,9 +205,9 @@ describe('schema signatures', () => {
   });
 
   it('renders detailed help', () => {
-    const help = renderToolHelp(tool, 'anycli call pets');
+    const help = renderToolHelp(tool, 'any2cli call pets');
     expect(help).toContain('Update a pet.');
-    expect(help).toContain('anycli call pets update-pet --petId <integer>');
+    expect(help).toContain('any2cli call pets update-pet --petId <integer>');
     expect(help).toMatch(/--petId <integer>\s+\(required\) Pet id/);
     expect(help).toContain('--status <available|sold>');
   });

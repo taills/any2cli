@@ -29,7 +29,7 @@ export function addAuthOptions(command: Command): Command {
     .option('--api-key <value>', 'API key value')
     .option('--api-key-name <name>', 'API key header/query/cookie name (default: from spec, else X-API-Key)')
     .option('--api-key-in <location>', 'header | query | cookie')
-    .option('--oauth', 'enable OAuth login (`anycli auth login <name>`)')
+    .option('--oauth', 'enable OAuth login (`any2cli auth login <name>`)')
     .option('--client-id <id>', 'OAuth client id')
     .option('--client-secret <secret>', 'OAuth client secret (confidential clients only)')
     .option('--scopes <list>', 'OAuth scopes, comma or space separated')

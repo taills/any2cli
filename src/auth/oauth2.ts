@@ -182,7 +182,7 @@ export async function authorizationCodeFlow(rawConfig: OAuth2Config, endpoints: 
       ...config.extraAuthParams,
     };
     Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
-    await announce(url.toString(), deps, 'authorize anycli');
+    await announce(url.toString(), deps, 'authorize any2cli');
     const code = await server.waitForCode(state, deps.timeoutMs ?? DEFAULT_LOGIN_TIMEOUT_MS);
     return await requestTokens(config, endpoints, {
       grant_type: 'authorization_code',

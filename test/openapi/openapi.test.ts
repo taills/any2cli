@@ -120,7 +120,7 @@ describe('compileSpec', () => {
   });
 
   it('round-trips the manifest cache', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-manifest-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-manifest-'));
     const manifest = await petstore();
     await writeManifest(dir, 'pets', manifest);
     expect(await readManifest(dir, 'pets')).toEqual(manifest);
@@ -173,7 +173,7 @@ describe('buildRequest', () => {
     expect(login.headers['Content-Type']).toBe('application/x-www-form-urlencoded');
     expect(String(login.body)).toBe('username=u&password=p+w');
 
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-upload-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-upload-'));
     const file = join(dir, 'cat.png');
     await writeFile(file, 'meow');
     const upload = await buildRequest(op(manifest, 'upload-photo'), {
@@ -203,7 +203,7 @@ describe('buildRequest', () => {
     const manifest = await petstore();
     expect(manifest.version).toBe(MANIFEST_VERSION);
     expect(op(manifest, 'upload-photo').body?.fileArgs).toEqual(['file']);
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-upload-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-upload-'));
     const request = await buildRequest(op(manifest, 'upload-photo'), {
       baseUrl: 'https://api.test',
       args: { petId: 1, caption: '@not-a-file' },
@@ -245,7 +245,7 @@ describe('buildRequest', () => {
       },
       { source: 'inline' },
     );
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-raw-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-raw-'));
     const file = join(dir, 'data.bin');
     await writeFile(file, Buffer.from([7, 8]));
     const put = op(manifest, 'put-file');
@@ -318,7 +318,7 @@ describe('OpenAPI adapter', () => {
       bytes: 3,
       note: 'binary body omitted; use --save <file>',
     });
-    const dir = await mkdtemp(join(tmpdir(), 'anycli-dl-'));
+    const dir = await mkdtemp(join(tmpdir(), 'any2cli-dl-'));
     const file = join(dir, 'out.bin');
     const saved = await adapter.callTool(await adapter.getTool('download'), {}, { ...OPTS, save: file });
     expect(saved.output).toMatchObject({ saved: file, bytes: 3 });
@@ -340,23 +340,23 @@ describe('OpenAPI adapter', () => {
   });
 
   it('masks configured headers that come from the environment in dry runs', async () => {
-    process.env.ANYCLI_TEST_TENANT = 'tenant-secret';
+    process.env.ANY2CLI_TEST_TENANT = 'tenant-secret';
     try {
       const adapter = openOpenApiAdapter({
         name: 'pets',
-        target: { ...target, headers: { 'X-Tenant': '${ANYCLI_TEST_TENANT}', 'X-Static': 's' } },
+        target: { ...target, headers: { 'X-Tenant': '${ANY2CLI_TEST_TENANT}', 'X-Static': 's' } },
         manifest,
         resolveAuth: noAuth,
       });
       const dry = await adapter.callTool(await adapter.getTool('list-pets'), {}, { ...OPTS, dryRun: true });
       expect(dry.output).toMatchObject({ headers: { 'X-Tenant': '***', 'X-Static': 's' } });
     } finally {
-      delete process.env.ANYCLI_TEST_TENANT;
+      delete process.env.ANY2CLI_TEST_TENANT;
     }
   });
 
   it('refuses to --save into protected directories before sending', async () => {
-    const home = await mkdtemp(join(tmpdir(), 'anycli-home-'));
+    const home = await mkdtemp(join(tmpdir(), 'any2cli-home-'));
     const before = api.requests.length;
     const adapter = openOpenApiAdapter({ name: 'pets', target, manifest, resolveAuth: noAuth, protectedDirs: [home] });
     await expect(

@@ -34,7 +34,7 @@ const LOCK_HEARTBEAT_MS = 5_000;
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Runs `fn` while holding an exclusive lock file, so parallel anycli processes (e.g. an agent
+ * Runs `fn` while holding an exclusive lock file, so parallel any2cli processes (e.g. an agent
  * running several calls at once) don't lose updates. The holder refreshes the lock's mtime while
  * it works, so only locks left behind by crashed runs ever look stale and get broken.
  */
@@ -58,7 +58,7 @@ export async function withFileLock<T>(lockPath: string, fn: () => Promise<T>): P
       }
       if (Date.now() > deadline) {
         throw new CliError('TIMEOUT', `Timed out waiting for lock ${lockPath}`, {
-          hint: `If no other anycli process is running, delete ${lockPath}`,
+          hint: `If no other any2cli process is running, delete ${lockPath}`,
         });
       }
       await sleep(LOCK_RETRY_MS);
@@ -88,7 +88,7 @@ async function realPathLenient(path: string): Promise<string> {
 }
 
 /**
- * Refuses file access inside protected directories (anycli's own config and credentials).
+ * Refuses file access inside protected directories (any2cli's own config and credentials).
  * Returns the symlink-resolved path; callers do their I/O on it, not on the original path.
  */
 export async function assertOutsideDirs(path: string, protectedDirs: readonly string[], action: 'read' | 'write'): Promise<string> {
@@ -96,7 +96,7 @@ export async function assertOutsideDirs(path: string, protectedDirs: readonly st
   for (const dir of protectedDirs) {
     const rel = relative(await realPathLenient(dir), target);
     if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) {
-      throw new CliError('USAGE', `Refusing to ${action} ${path}: it is inside anycli's private directory ${dir}`);
+      throw new CliError('USAGE', `Refusing to ${action} ${path}: it is inside any2cli's private directory ${dir}`);
     }
   }
   return target;

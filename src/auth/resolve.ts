@@ -22,7 +22,7 @@ export function isExpired(tokens: TokenSet, now: number): boolean {
 
 function loginRequired(name: string, cause?: unknown): CliError {
   return new CliError('AUTH_REQUIRED', `Not logged in to "${name}" (or the session expired)`, {
-    hint: `Run \`anycli auth login ${name}\``,
+    hint: `Run \`any2cli auth login ${name}\``,
     cause,
   });
 }

@@ -12,7 +12,7 @@ import { createTransport } from './transport.js';
 
 export { formatMcpResult } from './format.js';
 
-export const CLIENT_INFO = { name: 'anycli', version: '0.1.0' };
+export const CLIENT_INFO = { name: 'any2cli', version: '0.1.0' };
 
 export interface McpAdapterOptions {
   name: string;
@@ -23,7 +23,7 @@ export interface McpAdapterOptions {
   timeoutMs?: number;
   /** When set, the server's stderr is forwarded here live (e.g. --verbose). */
   stderr?: Writable;
-  /** Paths --save must never write to (anycli's own config and credentials). */
+  /** Paths --save must never write to (any2cli's own config and credentials). */
   protectedDirs?: readonly string[];
 }
 
@@ -51,7 +51,7 @@ function httpStatusOf(error: unknown): number | undefined {
 export function mapConnectError(error: unknown, name: string, stderrTail: string): CliError {
   const nested = findCliErrorInChain(error);
   if (nested) return nested;
-  const loginHint = `Run \`anycli auth login ${name}\`, or configure headers/auth for the target`;
+  const loginHint = `Run \`any2cli auth login ${name}\`, or configure headers/auth for the target`;
   if (error instanceof UnauthorizedError || httpStatusOf(error) === 401) {
     return new CliError('AUTH_REQUIRED', `Target "${name}" requires authentication`, { hint: loginHint, cause: error });
   }
@@ -60,7 +60,7 @@ export function mapConnectError(error: unknown, name: string, stderrTail: string
   }
   const message = error instanceof Error ? error.message : String(error);
   return new CliError('CONNECTION', `Cannot connect to MCP target "${name}": ${message}`, {
-    hint: `Check the target with \`anycli doctor ${name}\``,
+    hint: `Check the target with \`any2cli doctor ${name}\``,
     details: stderrTail ? { stderr: stderrTail } : undefined,
     cause: error,
   });
@@ -102,7 +102,7 @@ class McpAdapter implements TargetAdapter {
     if (tool) return tool;
     const similar = suggestNames(tools, name);
     throw new CliError('NOT_FOUND', `Tool "${name}" not found on target "${this.name}"`, {
-      hint: similar.length > 0 ? `Did you mean: ${similar.join(', ')}?` : `Run \`anycli tools ${this.name}\` to list tools`,
+      hint: similar.length > 0 ? `Did you mean: ${similar.join(', ')}?` : `Run \`any2cli tools ${this.name}\` to list tools`,
     });
   }
 

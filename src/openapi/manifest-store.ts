@@ -21,7 +21,7 @@ export async function readManifest(cacheDir: string, name: string): Promise<Open
   } catch (error) {
     if (isNotFound(error)) return undefined;
     throw new CliError('CONFIG', `Cached spec for "${name}" is unreadable: ${(error as Error).message}`, {
-      hint: `Run \`anycli refresh ${name}\``,
+      hint: `Run \`any2cli refresh ${name}\``,
     });
   }
 }

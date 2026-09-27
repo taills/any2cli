@@ -9,26 +9,26 @@ import { parseTarget } from '../../src/config/schema.js';
 import { getTarget, loadConfig, redactTarget, saveConfig, updateConfig, withTarget, withoutTarget } from '../../src/config/store.js';
 
 describe('resolvePaths', () => {
-  it('prefers ANYCLI_HOME', () => {
-    const paths = resolvePaths({ env: { ANYCLI_HOME: '/h' }, cwd: '/w', exists: () => false });
+  it('prefers ANY2CLI_HOME', () => {
+    const paths = resolvePaths({ env: { ANY2CLI_HOME: '/h' }, cwd: '/w', exists: () => false });
     expect(paths.home).toBe('/h');
     expect(paths.configFile).toBe('/h/config.json');
     expect(paths.credentialsDir).toBe('/h/credentials');
     expect(paths.cacheDir).toBe('/h/cache');
   });
 
-  it('uses an explicit --config path first, then ANYCLI_CONFIG, then a project file', () => {
-    const base = { env: { ANYCLI_HOME: '/h', ANYCLI_CONFIG: '/env.json' }, cwd: '/w' };
+  it('uses an explicit --config path first, then ANY2CLI_CONFIG, then a project file', () => {
+    const base = { env: { ANY2CLI_HOME: '/h', ANY2CLI_CONFIG: '/env.json' }, cwd: '/w' };
     expect(resolvePaths({ ...base, exists: () => true, configOverride: '/flag.json' }).configFile).toBe('/flag.json');
     expect(resolvePaths({ ...base, exists: () => true }).configFile).toBe('/env.json');
-    expect(resolvePaths({ env: { ANYCLI_HOME: '/h' }, cwd: '/w', exists: (p) => p === '/w/.anycli.json' }).configFile).toBe(
-      '/w/.anycli.json',
+    expect(resolvePaths({ env: { ANY2CLI_HOME: '/h' }, cwd: '/w', exists: (p) => p === '/w/.any2cli.json' }).configFile).toBe(
+      '/w/.any2cli.json',
     );
   });
 
   it('falls back to XDG_CONFIG_HOME', () => {
     const paths = resolvePaths({ env: { XDG_CONFIG_HOME: '/x' }, cwd: '/w', exists: () => false });
-    expect(paths.home).toBe('/x/anycli');
+    expect(paths.home).toBe('/x/any2cli');
   });
 });
 
@@ -59,7 +59,7 @@ describe('parseTarget', () => {
 describe('config store', () => {
   let dir: string;
   beforeEach(async () => {
-    dir = await mkdtemp(join(tmpdir(), 'anycli-cfg-'));
+    dir = await mkdtemp(join(tmpdir(), 'any2cli-cfg-'));
   });
 
   it('returns an empty config when the file is missing', async () => {
@@ -133,7 +133,7 @@ describe('config store', () => {
 
 describe('updateConfig', () => {
   it('does not lose concurrent updates', async () => {
-    const path = join(await mkdtemp(join(tmpdir(), 'anycli-upd-')), 'config.json');
+    const path = join(await mkdtemp(join(tmpdir(), 'any2cli-upd-')), 'config.json');
     await Promise.all(
       Array.from({ length: 6 }, (_, index) =>
         updateConfig(path, (config) => ({ raw: withTarget(config.raw, `t${index}`, { type: 'http', url: 'https://x.test/mcp' }), result: index })),
@@ -143,7 +143,7 @@ describe('updateConfig', () => {
   });
 
   it('leaves the config untouched when the update throws', async () => {
-    const path = join(await mkdtemp(join(tmpdir(), 'anycli-upd-')), 'config.json');
+    const path = join(await mkdtemp(join(tmpdir(), 'any2cli-upd-')), 'config.json');
     await expect(
       updateConfig(path, () => {
         throw new CliError('USAGE', 'nope');

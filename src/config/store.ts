@@ -54,7 +54,7 @@ export interface ConfigUpdate<T> {
 }
 
 /**
- * Read-modify-write of the config under a lock file, so concurrent `anycli add`/`import` runs
+ * Read-modify-write of the config under a lock file, so concurrent `any2cli add`/`import` runs
  * (e.g. an agent setting up several targets at once) don't drop each other's changes.
  */
 export async function updateConfig<T>(path: string, fn: (config: LoadedConfig) => ConfigUpdate<T> | Promise<ConfigUpdate<T>>): Promise<T> {
@@ -72,7 +72,7 @@ export function getTarget(config: Pick<LoadedConfig, 'targets'>, name: string): 
   const similar = suggestNames(known, name);
   const hint =
     known.length === 0
-      ? 'No targets configured yet. Add one with `anycli add mcp ...` or `anycli add openapi ...`'
+      ? 'No targets configured yet. Add one with `any2cli add mcp ...` or `any2cli add openapi ...`'
       : `Known targets: ${(similar.length > 0 ? similar : known.map((item) => item.name)).join(', ')}`;
   throw new CliError('NOT_FOUND', `Unknown target "${name}"`, { hint });
 }

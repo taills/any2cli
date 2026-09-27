@@ -93,7 +93,7 @@ async function login(context: Context, name: string, flags: LoginFlags): Promise
     return;
   }
   throw new CliError('USAGE', `Target "${name}" is not configured for OAuth`, {
-    hint: `Re-add it with --oauth (and --client-id for OpenAPI targets), e.g. \`anycli add ... --force --oauth\``,
+    hint: `Re-add it with --oauth (and --client-id for OpenAPI targets), e.g. \`any2cli add ... --force --oauth\``,
   });
 }
 

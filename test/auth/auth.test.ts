@@ -102,7 +102,7 @@ describe('credential store', () => {
   let store: CredentialStore;
   let dir: string;
   beforeEach(async () => {
-    dir = await mkdtemp(join(tmpdir(), 'anycli-cred-'));
+    dir = await mkdtemp(join(tmpdir(), 'any2cli-cred-'));
     store = new CredentialStore(join(dir, 'credentials'));
   });
 
@@ -151,7 +151,7 @@ describe('OAuth2 flows against a mock authorization server', () => {
   });
   afterAll(async () => server.close());
   beforeEach(async () => {
-    dir = await mkdtemp(join(tmpdir(), 'anycli-flow-'));
+    dir = await mkdtemp(join(tmpdir(), 'any2cli-flow-'));
     server.deny = false;
     server.expiresIn = 3600;
   });
@@ -289,7 +289,7 @@ describe('OAuth2 flows against a mock authorization server', () => {
     const config = oauth2({ tokenUrl: `${server.url}/token` });
     await expect(resolveAuthMaterial('nobody', config, { store })).rejects.toMatchObject({
       code: 'AUTH_REQUIRED',
-      hint: expect.stringContaining('anycli auth login nobody'),
+      hint: expect.stringContaining('any2cli auth login nobody'),
     });
   });
 });

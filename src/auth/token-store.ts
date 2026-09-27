@@ -51,7 +51,7 @@ export class CredentialStore {
     } catch (error) {
       if (isNotFound(error)) return { version: 1 };
       throw new CliError('CONFIG', `Credential file for "${name}" is unreadable: ${(error as Error).message}`, {
-        hint: `Run \`anycli auth logout ${name}\` and log in again`,
+        hint: `Run \`any2cli auth logout ${name}\` and log in again`,
       });
     }
   }

@@ -41,7 +41,7 @@ function convertEntry(entry: Entry): Record<string, unknown> {
 
 /**
  * Converts the `mcpServers` map used by Claude Desktop / Claude Code / Cursor, or the `servers`
- * map used by VS Code, into anycli targets.
+ * map used by VS Code, into any2cli targets.
  */
 export function convertMcpServers(document: unknown, prefix = ''): ConversionResult {
   const doc = (document ?? {}) as Record<string, unknown>;

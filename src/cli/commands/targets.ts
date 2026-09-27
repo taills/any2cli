@@ -65,10 +65,10 @@ function registerAddMcp(add: Command, ctx: () => Context): void {
       .option('-e, --env <KEY=VALUE>', 'environment variable for the stdio server (repeatable)', collect)
       .option('-H, --header <"Name: value">', 'HTTP header for remote servers (repeatable)', collect)
       .option('--cwd <dir>', 'working directory for the stdio server')
-      .option('-d, --description <text>', 'description shown in `anycli list` and generated skills')
+      .option('-d, --description <text>', 'description shown in `any2cli list` and generated skills')
       .option('-f, --force', 'overwrite an existing target'),
   )
-    .addHelpText('after', '\nExamples:\n  anycli add mcp fs -- npx -y @modelcontextprotocol/server-filesystem ~/src\n  anycli add mcp linear https://mcp.linear.app/mcp --oauth\n  anycli add mcp internal https://mcp.example.com/sse -H "Authorization: Bearer ${TOKEN}"')
+    .addHelpText('after', '\nExamples:\n  any2cli add mcp fs -- npx -y @modelcontextprotocol/server-filesystem ~/src\n  any2cli add mcp linear https://mcp.linear.app/mcp --oauth\n  any2cli add mcp internal https://mcp.example.com/sse -H "Authorization: Bearer ${TOKEN}"')
     .action(async (name: string, commandOrUrl: string, args: string[], flags: AddMcpFlags) => {
       const context = ctx();
       const isUrl = /^https?:\/\//i.test(commandOrUrl);
@@ -96,7 +96,7 @@ function registerAddMcp(add: Command, ctx: () => Context): void {
       }
       const target = await saveNewTarget(context, name, raw, flags.force === true);
       if (hasLiteralSecret(flags)) context.printer.info('tip: pass secrets as "${ENV_VAR}" so they are read from the environment instead of stored in the config');
-      const next = target.type !== 'stdio' && target.auth?.type === 'mcp-oauth' ? `anycli auth login ${name}` : `anycli tools ${name}`;
+      const next = target.type !== 'stdio' && target.auth?.type === 'mcp-oauth' ? `any2cli auth login ${name}` : `any2cli tools ${name}`;
       context.printer.result({ added: name, target: redactTarget(target) }, `Added ${target.type} target "${name}". Next: ${next}`);
     });
 }
@@ -141,10 +141,10 @@ function registerAddOpenApi(add: Command, ctx: () => Context): void {
       .option('-H, --header <"Name: value">', 'extra HTTP header for every request (repeatable)', collect)
       .option('--include <patterns>', 'only expose matching operations (comma separated; globs; tag:<name>)')
       .option('--exclude <patterns>', 'hide matching operations (comma separated; globs; tag:<name>)')
-      .option('-d, --description <text>', 'description shown in `anycli list` and generated skills')
+      .option('-d, --description <text>', 'description shown in `any2cli list` and generated skills')
       .option('-f, --force', 'overwrite an existing target'),
   )
-    .addHelpText('after', '\nExamples:\n  anycli add openapi petstore https://petstore3.swagger.io/api/v3/openapi.json\n  anycli add openapi github ./api.github.com.yaml --include "tag:repos" --bearer "${GITHUB_TOKEN}"\n  anycli add openapi acme https://api.acme.dev/openapi.json --oauth --client-id my-client')
+    .addHelpText('after', '\nExamples:\n  any2cli add openapi petstore https://petstore3.swagger.io/api/v3/openapi.json\n  any2cli add openapi github ./api.github.com.yaml --include "tag:repos" --bearer "${GITHUB_TOKEN}"\n  any2cli add openapi acme https://api.acme.dev/openapi.json --oauth --client-id my-client')
     .action(async (name: string, spec: string, flags: AddOpenApiFlags) => {
       const context = ctx();
       assertTargetName(name);
@@ -167,7 +167,7 @@ function registerAddOpenApi(add: Command, ctx: () => Context): void {
       if (hint) context.printer.info(hint);
       oauthEndpointNotice(target).forEach((line) => context.printer.info(line));
       const baseUrl = target.baseUrl ?? '(none — set --base-url)';
-      const next = target.auth?.type === 'oauth2' && target.auth.flow !== 'client_credentials' ? `anycli auth login ${name}` : `anycli tools ${name}`;
+      const next = target.auth?.type === 'oauth2' && target.auth.flow !== 'client_credentials' ? `any2cli auth login ${name}` : `any2cli tools ${name}`;
       context.printer.result(
         { added: name, title: manifest.title, operations: manifest.operations.length, baseUrl, target: redactTarget(target) },
         `Added "${name}": ${manifest.title} — ${manifest.operations.length} operations, base URL ${baseUrl}. Next: ${next}`,
@@ -225,7 +225,7 @@ function registerManagement(program: Command, ctx: () => Context): void {
       const entries = Object.entries(config.targets);
       const text =
         entries.length === 0
-          ? 'No targets yet. Add one with `anycli add mcp ...` or `anycli add openapi ...`'
+          ? 'No targets yet. Add one with `any2cli add mcp ...` or `any2cli add openapi ...`'
           : table(entries.map(([name, target]) => [name, target.type, describeTarget(target)]));
       context.printer.result(
         entries.map(([name, target]) => ({ name, type: target.type, description: describeTarget(target), auth: target.type === 'stdio' ? undefined : target.auth?.type })),
