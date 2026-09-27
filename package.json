@@ -1,5 +1,5 @@
 {
-  "name": "anycli",
+  "name": "anycli-mcp",
   "version": "0.1.0",
   "description": "Turn any MCP server (stdio/SSE/HTTP) or OpenAPI spec into an agent-friendly CLI, with built-in OAuth2 browser login.",
   "repository": {

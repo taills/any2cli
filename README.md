@@ -32,7 +32,8 @@ $ anycli petstore find-pets-by-status --status sold
 ## Install
 
 ```sh
-npm install -g anycli      # Node.js 20+
+npm install -g anycli-mcp  # Node.js 20+; installs the `anycli` command
+npx anycli-mcp --help      # or run it without installing
 ```
 
 ## Adding targets

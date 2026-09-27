@@ -48,7 +48,7 @@ jobs:
           import { readFileSync } from 'node:fs';
           import assert from 'node:assert/strict';
           const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
-          assert.equal(pkg.name, 'anycli');
+          assert.equal(pkg.name, 'anycli-mcp');
           assert.equal(pkg.repository.url,
             'git+https://github.com/taills/anycli.git');
           assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
@@ -116,7 +116,7 @@ jobs:
           # has taken over three minutes, so wait six before failing.
           # npm 接受发布早于读取端可见，实测同步超过三分钟，因此等待六分钟。
           for attempt in $(seq 1 36); do
-            if npm view "anycli@$VERSION" \
+            if npm view "anycli-mcp@$VERSION" \
               version dist.integrity dist.tarball --json \
               --prefer-online --registry=https://registry.npmjs.org; then
               exit 0
