@@ -1,0 +1,41 @@
+{
+  "swagger": "2.0",
+  "info": { "title": "Legacy API", "version": "2.0.0" },
+  "host": "legacy.example.test",
+  "basePath": "/api",
+  "schemes": ["https"],
+  "securityDefinitions": {
+    "oauth": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://legacy.example.test/oauth/authorize",
+      "tokenUrl": "https://legacy.example.test/oauth/token",
+      "scopes": { "read": "Read access" }
+    }
+  },
+  "paths": {
+    "/users/{id}": {
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get a user",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "createUser",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": { "type": "object", "properties": { "email": { "type": "string" } }, "required": ["email"] }
+          }
+        ],
+        "responses": { "201": { "description": "created" } }
+      }
+    }
+  }
+}
